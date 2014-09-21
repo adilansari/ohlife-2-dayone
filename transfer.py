@@ -4,26 +4,29 @@ import os
 from pprint import PrettyPrinter
 
 
-def migrate(filename, dry_run=False):
+def migrate(filename, dry_run=True):
     date = None
     tmp_file = 'data/tmp.txt'
 
     for line in filename:
         if is_date(line):
             if date:
-                write_to_dayone(date, tmp_file)    # Write to dayone
+                write_to_dayone(date, tmp_file, dry_run)    # Write to dayone
                 open(tmp_file, 'w').close()     # flush the temporary file
             date = strip_to_date(line)
         else:
             write_to_tmp(line, tmp_file)     # clean up the line and append to tmp.txt
 
-    write_to_dayone(date, tmp_file)
+    write_to_dayone(date, tmp_file, dry_run)
     os.remove(tmp_file)
 
 
-def write_to_dayone(date, tmp_file):
-    with open(tmp_file, 'r') as content:
-        print date + '\n' + content.read()
+def write_to_dayone(date, tmp_file, dry_run):
+    if dry_run:
+        with open(tmp_file, 'r') as content:
+            print date + '\n' + content.read()
+    else:
+        print 'Logging entry for {0} in dayone'.format(date)
 
 
 def write_to_tmp(text, tmp_file):
@@ -31,6 +34,7 @@ def write_to_tmp(text, tmp_file):
     if text is not None:
         with open(tmp_file, 'a') as tmp_file:
             tmp_file.write(text + '\n')
+
 
 def clean_text(text):
     text = text.strip('\n').strip('\r').strip(' ')
@@ -46,9 +50,7 @@ def is_date(date_text):
     try:
         datetime.datetime.strptime(strip_to_date(date_text), '%Y/%m/%d')
     except ValueError:
-        # raise ValueError("Incorrect data format, should be YYYY/MM/DD")
         return False
-
     return True
     
 
@@ -62,7 +64,7 @@ def main():
     parser.add_argument('-d', '--no-dry-run', default=True,
                         dest="dry_run",
                         action="store_false",
-                        help="""Actually write to mongo""")
+                        help="""Actually write to dayone""")
     parser.add_argument('-f', default='data/sample.txt',
                     dest="filename",
                     type=argparse.FileType('r'),
