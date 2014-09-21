@@ -1,7 +1,6 @@
 import argparse
 import datetime
 import os
-from pprint import PrettyPrinter
 
 
 def migrate(filename, dry_run=True):
@@ -27,6 +26,8 @@ def write_to_dayone(date, tmp_file, dry_run):
             print date + '\n' + content.read()
     else:
         print 'Logging entry for {0} in dayone'.format(date)
+        command = 'dayone -d="{0}" -s=false new < {1}'.format(date, tmp_file)
+        os.system(command)
 
 
 def write_to_tmp(text, tmp_file):
@@ -42,7 +43,7 @@ def clean_text(text):
         return None
 
     if '-' not in text[:4]:
-        text = '- '+ text
+        text = '- ' + text
     return text
 
 
@@ -52,14 +53,13 @@ def is_date(date_text):
     except ValueError:
         return False
     return True
-    
+
 
 def strip_to_date(date_text):
-    return date_text.strip('\n').strip('\r').replace('-','/')
+    return date_text.strip('\n').strip('\r').replace('-', '/')
 
 
 def main():
-
     parser = argparse.ArgumentParser(description="""Migrate ohlife export data file to dayone app""")
     parser.add_argument('-d', '--no-dry-run', default=True,
                         dest="dry_run",
@@ -69,9 +69,8 @@ def main():
                     dest="filename",
                     type=argparse.FileType('r'),
                     help="""filename including path to load from, by default it will look for data/sample.txt""")
-    
+
     args = parser.parse_args()
-    
     migrate(args.filename, args.dry_run)
 
 
