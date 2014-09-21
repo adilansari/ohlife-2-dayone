@@ -1,14 +1,31 @@
 import argparse
+import datetime
 from pprint import PrettyPrinter
+
+TEMPORARY_FILE = 'tmp.txt'
 
 def migrate(filename, dry_run=False):
     for line in filename:
-        print line
+        if is_date(line):
+            date = strip_to_date(line)
 
 
 def logger(date, content):
     pp = PrettyPrinter(indent=4)
     print str(date) + '\n' + content
+
+
+def is_date(date_text):
+    try:
+        datetime.datetime.strptime(strip_to_date(date_text), '%Y/%m/%d')
+    except ValueError:
+        # raise ValueError("Incorrect data format, should be YYYY-MM-DD")
+        return False
+
+    return True
+    
+def strip_to_date(date_text):
+    return date_text.strip('\n').strip('\r').replace('-','/')
 
 
 def main():
