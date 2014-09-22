@@ -61,7 +61,7 @@ def strip_to_date(date_text):
 
 def main():
     parser = argparse.ArgumentParser(description="""Migrate ohlife export data file to dayone app""")
-    parser.add_argument('-d', '--no-dry-run', default=True,
+    parser.add_argument('-d', default=True,
                         dest="dry_run",
                         action="store_false",
                         help="""Actually write to dayone""")
